@@ -141,7 +141,7 @@ void PrintClientRecordLine(sClient Client)
 
 void ShowAllClientsScreen()
 {
-    vector<sClient> vClients =LoadCleintsDataFromFile(ClientsFileName);
+    vector<sClient> vClients = LoadCleintsDataFromFile(ClientsFileName);
     cout << "\n\t\t\t\t\tClient List (" << vClients.size() << ")  Client(s).";
     cout << "\n_______________________________________________________";
     cout << "_________________________________________\n"
@@ -163,7 +163,8 @@ void ShowAllClientsScreen()
             cout << endl;
         }
     cout << "\n_______________________________________________________";
-    cout << "_________________________________________\n" << endl;
+    cout << "_________________________________________\n"
+         << endl;
 }
 
 void PrintClientCard(sClient Client)
@@ -329,15 +330,15 @@ bool UpdateClientByAccountNumber(string AccountNumber, vector<sClient> &vClients
     return false;
 }
 
-double ReadAmount()
+double ReadAmount(string Message)
 {
     double amount;
     do
-        {
-            cout << "\nPlease enter deposit amount? ";
-            cin >> amount;
-        } while (amount <= 0);
-        return amount;
+    {
+        cout << Message;
+        cin >> amount;
+    } while (amount <= 0);
+    return amount;
 }
 
 void Deposit(string AccountNumber)
@@ -349,7 +350,7 @@ void Deposit(string AccountNumber)
     if (FindClientByAccountNumber(AccountNumber, vClients, Client))
     {
         PrintClientCard(Client);
-        amount = ReadAmount();
+        amount = ReadAmount("\nPlease enter deposit amount? ");
 
         cout << "\nAre you sure you want perform this transaction? y/n? ";
         cin >> SureAdd;
@@ -375,10 +376,10 @@ void Deposit(string AccountNumber)
     }
 }
 
-double TotalBalancesF(vector <sClient> vClients)
+double TotalBalancesF(vector<sClient> vClients)
 {
-    double TotalBalances =0.00;
-    for(sClient & C :vClients)
+    double TotalBalances = 0.00;
+    for (sClient &C : vClients)
     {
         TotalBalances += C.AccountBalance;
     }
@@ -394,15 +395,17 @@ void PrintClientRecrdlineForTotalBalancesOnly(sClient Client)
 
 void ShowTotalBalances()
 {
-     vector<sClient> vClients =LoadCleintsDataFromFile(ClientsFileName);
+    vector<sClient> vClients = LoadCleintsDataFromFile(ClientsFileName);
     cout << "\n\t\t\t\t\tClient List (" << vClients.size() << ")  Client(s).";
     cout << "\n_______________________________________________________";
-    cout << "_________________________________________\n"<< endl;
+    cout << "_________________________________________\n"
+         << endl;
     cout << "| " << left << setw(15) << "Accout Number";
     cout << "| " << left << setw(40) << "Client Name";
     cout << "| " << left << setw(12) << "Balance";
     cout << "\n_______________________________________________________";
-    cout << "_________________________________________\n"<< endl;
+    cout << "_________________________________________\n"
+         << endl;
     if (vClients.size() == 0)
         cout << "\t\t\t\tNo Clients Available In the System!";
     else
@@ -412,9 +415,50 @@ void ShowTotalBalances()
             cout << endl;
         }
     cout << "\n_______________________________________________________";
-    cout << "_________________________________________\n" << endl;
-    double TotalBalances =TotalBalancesF(vClients);
-    cout << "\n\t\t\t\t\tTotal Balances = " << TotalBalances<<endl;
+    cout << "_________________________________________\n"
+         << endl;
+    double TotalBalances = TotalBalancesF(vClients);
+    cout << "\n\t\t\t\t\tTotal Balances = " << TotalBalances << endl;
+}
+
+void WithDraw(string AccountNumber)
+{
+    sClient Client;
+    vector<sClient> vClients = LoadCleintsDataFromFile(ClientsFileName);
+    double amount;
+    char SureDraw = 'n';
+    if (FindClientByAccountNumber(AccountNumber, vClients, Client))
+    {
+        PrintClientCard(Client);
+        amount = ReadAmount("\nPlease enter withdraw amount? ");
+        for (sClient &C : vClients)
+        {
+            if (C.AccountNumber == AccountNumber)
+            {
+
+                while (C.AccountBalance < amount)
+                {
+                    cout << "\nAmount Exceeds the balance, you can wuth draw up to : " << C.AccountBalance;
+                    amount = ReadAmount("\nPlease enter withdraw amount? ");
+                }
+                C.AccountBalance -= amount;
+                break;
+            }
+        }
+        cout << "\nAre you sure you want perform this transaction? y/n? ";
+        cin >> SureDraw;
+        if (toupper(SureDraw) == 'Y')
+        {
+            SaveCleintsDataToFile(ClientsFileName, vClients);
+        }
+    }
+    else
+    {
+        cout << "\nClien with [" << AccountNumber << "] does not exist.\n";
+        cout << "\nPlease enter Account Number? ";
+        cin >> AccountNumber;
+        Deposit(AccountNumber);
+    }
 }
 
 string ReadClientAccountNumber()
@@ -558,8 +602,8 @@ void ShowMainMenue()
 
 int main()
 {
-    //ShowMainMenue();
-    ShowTotalBalances();
+    // ShowMainMenue();
+    WithDraw(ReadClientAccountNumber());
     system("pause>0");
     return 0;
 }
