@@ -368,6 +368,7 @@ void Deposit(string AccountNumber)
             }
         }
         SaveCleintsDataToFile(ClientsFileName, vClients);
+        cout<<"\nThe process completed successfully...\n";
     }
     else
     {
@@ -453,6 +454,7 @@ void WithDraw(string AccountNumber)
         {
             SaveCleintsDataToFile(ClientsFileName, vClients);
         }
+         cout<<"\nThe process completed successfully...\n";
     }
     else
     {
